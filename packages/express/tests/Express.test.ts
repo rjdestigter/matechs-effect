@@ -3,10 +3,12 @@ import { effect as T } from "@matechs/effect";
 import { Do } from "fp-ts-contrib/lib/Do";
 import * as EX from "../src";
 import * as H from "@matechs/http-client";
-import * as L from "@matechs/http-client-libcurl";
+import * as L from "@matechs/http-client-fetch";
 import { pipe } from "fp-ts/lib/pipeable";
 import { raise, done } from "@matechs/effect/lib/original/exit";
 import { some } from "fp-ts/lib/Option";
+
+import fetch from "isomorphic-fetch";
 
 describe("Express", () => {
   it("should use express", async () => {
@@ -56,7 +58,7 @@ describe("Express", () => {
       pipe(
         H.post("http://127.0.0.1:3003/", {}),
         T.chain((s) => T.fromOption(() => new Error("empty body"))(s.body)),
-        T.provideS(L.client)
+        T.provideS(L.client(fetch))
       )
     );
 
@@ -65,7 +67,7 @@ describe("Express", () => {
         H.post("http://127.0.0.1:3003/bad", {}),
         T.mapError((s) => s._tag === H.HttpErrorReason.Response && s.response && s.response.body),
         T.chain((s) => T.fromOption(() => new Error("empty body"))(s.body)),
-        T.provideS(L.client)
+        T.provideS(L.client(fetch))
       )
     );
 
@@ -74,7 +76,7 @@ describe("Express", () => {
         H.post("http://127.0.0.1:3003/bad2", {}),
         T.mapError((s) => s._tag === H.HttpErrorReason.Response && s.response && s.response.body),
         T.chain((s) => T.fromOption(() => new Error("empty body"))(s.body)),
-        T.provideS(L.client)
+        T.provideS(L.client(fetch))
       )
     );
 
@@ -83,7 +85,7 @@ describe("Express", () => {
         H.post("http://127.0.0.1:3003/bad3", {}),
         T.mapError((s) => s._tag === H.HttpErrorReason.Response && s.response && s.response.body),
         T.chain((s) => T.fromOption(() => new Error("empty body"))(s.body)),
-        T.provideS(L.client)
+        T.provideS(L.client(fetch))
       )
     );
 
@@ -91,7 +93,7 @@ describe("Express", () => {
       pipe(
         H.post("http://127.0.0.1:3003/access", {}),
         T.chain((s) => T.fromOption(() => new Error("empty body"))(s.body)),
-        T.provideS(L.client)
+        T.provideS(L.client(fetch))
       )
     );
 
